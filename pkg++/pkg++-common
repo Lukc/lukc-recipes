@@ -1,0 +1,52 @@
+description="A multidistribution packages builder."
+url="http://devel.upyum.com/pkgxx/"
+packager="Lukc <XMPP/SMTP: lukc AT upyum DOT com>"
+maintainer="Lukc <XMPP/SMTP: lukc AT upyum DOT com>"
+
+longdesc="pkg++ is capable of building packages for dpkg, rpm, pacman,
+the pkgtools, and many others! It supports useflags, includes, 
+splits, getting sources on a SCM, and many other things.
+
+pkg++ uses recipes called Pkgfiles to build packages. They
+look like a lot to the PKGBUILDs of Arch AUR or Crux's
+Pkgfiles."
+
+name=pkg++
+if [[ "$version" = "devel" ]]; then
+	source=(git://upyum.com/pkgxx)
+else
+	source=($url/$name-$version.tar.xz)
+fi
+config=(${sysconfdir:-/etc}/pkg++.conf)
+
+case $distribution in
+	Mandriva|Fedora|*SuSE) : ${package_manager:=rpm} ;;
+	Arch)           : ${package_manager:=pacman}   	;;
+	Frugalware)     : ${package_manager:=pacman-g2}	;;
+	Debian|Ubuntu)  : ${package_manager:=dpkg}     	;;
+	Slackware)      : ${package_manager:=pkgtools} 	;;
+	"")                                            	;;
+	*)              : ${package_manager:=pkgutils} 	;;
+esac
+
+depends=(zsh ${package_manager})
+
+configure_opts=(
+	--prefix=${prefix:-/usr}
+	--sharedir=${sharedir:-$prefix/share}
+	--sysconfdir=${sysconfdir:-/etc}
+	--mandir=${mandir:-$sharedir/man}
+	--package-manager=${package_manager:-pkgutils}
+	${configure_opts[@]}
+)
+
+build(){
+	if [[ "$version" = "devel" ]]; then
+		cd $name
+	else
+		cd $name-$version
+	fi
+	./configure \
+		${configure_opts[@]}
+	pkgmake -B DESTDIR=$PKG install
+}
