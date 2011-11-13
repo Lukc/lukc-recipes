@@ -1,0 +1,32 @@
+packager="Lukc <lukc@upyum.com>"
+maintainer="Lukc <lukc@upyum.com>"
+url="http://www.lua.org"
+
+name=lua
+release=1
+source=(http://www.lua.org/work/$name-$version.tar.gz)
+
+include lua
+
+build () {
+	cd $name-$version
+	pkgmake INSTALL_TOP=$PKG/$prefix linux
+	pkgmake INSTALL_TOP=$PKG/$prefix install
+	if use slots; then
+		for i in lua luac; do
+			mv ${PKG}/$prefix/bin/$i ${PKG}/$prefix/bin/$i-${lua_version}
+			ln -s $prefix/bin/$i-${lua_version} ${PKG}/$prefix/bin/$i
+		done
+		for i in $(ls ${PKG}/$prefix/include); do
+			mkdir -p ${PKG}/$prefix/include/lua-${lua_version}
+			mv ${PKG}/$prefix/include/$i ${PKG}/$prefix/include/lua-${lua_version}/$i
+			ln -s $prefix/include/lua-${lua_version}/$i ${PKG}/$prefix/include/$i
+		done
+		for i in $(ls ${PKG}/$prefix/lib | egrep -v '^lua$'); do
+			mkdir -p ${PKG}/$prefix/lib/lua-${lua_version}
+			mv ${PKG}/$prefix/lib/$i ${PKG}/$prefix/lib/lua-${lua_version}/$i
+			ln -s $prefix/lib/lua-${lua_version}/$i ${PKG}/$prefix/lib/$i
+		done
+	fi
+}
+
