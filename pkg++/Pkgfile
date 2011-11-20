@@ -2,6 +2,7 @@ description="A multidistribution packages builder."
 url="http://devel.upyum.com/pkgxx/"
 packager="Lukc <XMPP/SMTP: lukc AT upyum DOT com>"
 maintainer="Lukc <XMPP/SMTP: lukc AT upyum DOT com>"
+license="GPLv2"
 
 longdesc="pkg++ is capable of building packages for dpkg, rpm, pacman,
 the pkgtools, and many others! It supports useflags, includes, 
@@ -12,6 +13,23 @@ look like a lot to the PKGBUILDs of Arch AUR or Crux's
 Pkgfiles."
 
 name=pkg++
+version=0.10.2 # Last stable release.
+lastver="wcat '$url' | grep '<div id=\"download\">' | sed -e \"s/.*\\\">//;s/<.*//\""
+release=1
+
+#use_unstable=(1 "Use the not-yet-stable releases if available.")
+use_devel=(0 "Use the unreleased development code.")
+
+iuse=(unstable devel) # FIXME: "unstable||devel", in the future ?
+if use unstable; then
+	version=0.11.3
+	lastver="echo $version" # They might not be always working.
+fi
+if use devel; then
+	version=devel
+	lastver="echo devel" # Nothing can be more up to date than “devel”
+fi
+
 if [[ "$version" = "devel" ]]; then
 	source=(git://upyum.com/pkgxx)
 else
@@ -25,8 +43,7 @@ case $distribution in
 	Frugalware)     : ${package_manager:=pacman-g2}	;;
 	Debian|Ubuntu)  : ${package_manager:=dpkg}     	;;
 	Slackware)      : ${package_manager:=pkgtools} 	;;
-	"")                                            	;;
-	*)              : ${package_manager:=pkgutils} 	;;
+	Crux)           : ${package_manager:=pkgutils} 	;;
 esac
 
 depends=(zsh ${package_manager})
@@ -40,7 +57,7 @@ configure_opts=(
 	${configure_opts[@]}
 )
 
-build(){
+build() {
 	if [[ "$version" = "devel" ]]; then
 		cd $name
 	else
@@ -49,4 +66,14 @@ build(){
 	./configure \
 		${configure_opts[@]}
 	pkgmake -B DESTDIR=$PKG install
+}
+
+post_build() {
+	info "Checking the Pkgfile with the package's pkg++."
+	cd "$PKGMK_ROOT"
+	$PKG/$prefix/bin/pkg++ -cp
+}
+
+check() {
+	:
 }
