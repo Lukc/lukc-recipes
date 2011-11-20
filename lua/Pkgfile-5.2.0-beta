@@ -5,8 +5,11 @@ url="http://www.lua.org"
 name=lua
 release=1
 source=(http://www.lua.org/work/$name-$version.tar.gz)
+iuse=(slots)
 
 include lua
+depends=() # The lua dependency is not required, in this specific case.
+lua_version=${version%.*}
 
 build () {
 	cd $name-$version
