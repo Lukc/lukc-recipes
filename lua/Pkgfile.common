@@ -12,7 +12,7 @@ depends=() # The lua dependency is not required, in this specific case.
 lua_version=${version%.*}
 
 build () {
-	cd $name-$version
+	cd $name-${version%-*}
 	pkgmake INSTALL_TOP=$PKG/$prefix linux
 	pkgmake INSTALL_TOP=$PKG/$prefix install
 	if use slots; then
