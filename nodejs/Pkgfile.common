@@ -23,7 +23,8 @@ fi
 
 name=nodejs
 release=1
-source=(http://nodejs.org/dist/node-v$version.tar.gz)
+source=(http://nodejs.org/dist/v$version/node-v$version.tar.gz)
+lastver="lastver \$(wcat http://nodejs.org/dist | grep -v '\.tar\.gz'| grep 'v.*/' | sed -e 's/\/.*$//;s/^.*v//')"
 
 build() {
 	cd node-v$version
@@ -47,8 +48,12 @@ build() {
 	./configure \
 		--prefix="$prefix" \
 		--libdir="$libdir" \
-		$(if ! use openssl; then echo "--without-ssl"; fi)
+		$(use_with openssl ssl)
 	make
 	make DESTDIR="$PKG" install
+}
+
+check() {
+	:
 }
 
