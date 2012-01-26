@@ -1,4 +1,3 @@
-#!/usr/bin/env pkg++
 
 packager="Lukc <lukc@upyum.com>"
 maintainer="Lukc <lukc@upyum.com>"
@@ -11,7 +10,7 @@ to draw image instead of text everywhere you want with a simple
 sequence."
 
 url="http://wmfs.info"
-depends=(xlib)
+depends=(xlib freetype)
 license="BSD"
 
 iuse=(imlib2 xrandr xinerama)
@@ -37,12 +36,14 @@ elif $Debian; then
 	depends=(${depends[@]//xinerama/libxinerama1})
 	depends=(${depends[@]//xrandr/libxrandr2})
 	depends=(${depends[@]//imlib2/libimlib2})
+	depends=(${depends[@]//freetype/libfreetype6})
 fi
 
 name=wmfs
 version=devel
 release=1
 source=(git://git.wmfs.info/wmfs.git)
+lastver="git:lastver $source"
 
 build() {
 	cd $name
@@ -51,6 +52,8 @@ build() {
 			sedi "/$(echo "$use" | tr '[a-z]' '[A-Z]')=\"/s/\".*\"/\"\"/" configure
 		fi
 	done
+	
+	# Is not autotools.
 	./configure \
 		--prefix "$prefix" \
 		--man-prefix "$mandir" \
@@ -60,3 +63,7 @@ build() {
 	make DESTDIR="$PKG" install
 }
 
+check() {
+	# What else could we possibly do?
+	wmfs -h > /dev/null
+}
