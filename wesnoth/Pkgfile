@@ -48,7 +48,7 @@ if $Debian; then
 	)
 else
 	# Those are Crux dependencies. They may not be exact on any distribution.
-	depends(
+	depends=(
 		boost
 		cmake
 		pango
