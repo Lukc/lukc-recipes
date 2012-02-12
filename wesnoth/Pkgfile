@@ -1,0 +1,86 @@
+
+# TODO:
+#  * server opts
+#  * (auto)splits
+
+description="The Battle for Wesnoth is a turn-based tactical strategy game with a high fantasy theme."
+
+packager="Lukc <lukc@upyum.com>"
+maintainer="Lukc <lukc@upyum.com>"
+
+longdesc="Build up a great army, gradually turning raw recruits into hardened
+veterans. In later games, recall your toughest warriors and
+form a deadly host whom none can stand against! Choose units
+from a large pool of specialists, and hand-pick a force with
+the right strengths to fight well on different terrains
+against all manner of opposition. "
+license=GPL
+
+name=wesnoth
+version=1.10
+release=1
+includes=(sourceforge cmake)
+sf_dirname=project/wesnoth/wesnoth-1.10/wesnoth-1.10
+sf_extension=.tar.bz2
+lastver="wcat wesnoth.org | grep 'Download Wesnoth' | head -n 1 | sed -e 's/.*Download Wesnoth //;s/ .*//'"
+
+if $Debian; then
+	# Those were taken on Ubuntu, but were never tested because of build failure.
+	depends=(
+		"libboost-iostreams1.42.0 >= 1.42-1"
+		"libboost-regex1.42.0 >= 1.42-1"
+		"libc6 >= 2.4"
+		"libcairo2 >= 1.2.4"
+		"libdbus-1-3 >= 1.0.2"
+		"libfontconfig1 >= 2.8.0"
+		"libfribidi0 >= 0.19.2"
+		"libgcc1 >= 1:4.1.1"
+		"libglib2.0-0 >= 2.12.0"
+		"liblua5.1-0"
+		"libpango1.0-0 >= 1.22.0"
+		"libsdl-image1.2 >= 1.2.10"
+		"libsdl-mixer1.2 >= 1.2.6"
+		"libsdl-net1.2"
+		"libsdl-ttf2.0-0"
+		"libsdl1.2debian >= 1.2.10-1"
+		"libstdc++6 >= 4.6"
+		"libx11-6"
+	)
+else
+	# Those are Crux dependencies. They may not be exact on any distribution.
+	depends(
+		boost
+		cmake
+		pango
+		sdl_image
+		sdl_mixer
+		sdl_net
+		sdl_ttf
+		lua
+	)
+	if ! $Crux; then
+		warning "This package has a lot of dependencies, and most of them are"
+		warning "probably wrong on your distribution. You should edit the recipe."
+	fi
+fi
+
+function cmake_enable {
+	local FLAG="$1"
+	local CMAKE_OPT="$2"
+	echo -n "-DENABLE_${CMAKE_OPT}="
+	if use "$FLAG"; then
+		echo "YES"
+	else
+		echo "NO"
+	fi
+	iuse=(${iuse[@]//$FLAG} $FLAG)
+}
+
+cmake_opts=(
+	$(cmake_enable nls NLS)
+	$(cmake_enable desktop DESKTOP_ENTRY)
+	$(cmake_enable server SERVER)
+	$(cmake_enable server CAMPAIGN_SERVER)
+
+)
+
