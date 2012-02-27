@@ -17,11 +17,12 @@ against all manner of opposition. "
 license=GPL
 
 name=wesnoth
-version=1.10
+version=1.10.1
+branch=1.10
 release=1
-includes=(sourceforge cmake)
-sf_dirname=project/wesnoth/wesnoth-1.10/wesnoth-1.10
+sf_dirname=project/wesnoth/wesnoth-$branch/wesnoth-$version
 sf_extension=.tar.bz2
+include sourceforge cmake
 lastver="wcat wesnoth.org | grep 'Download Wesnoth' | head -n 1 | sed -e 's/.*Download Wesnoth //;s/ .*//'"
 
 use_wesnothd=(1   "Build wesnothd, the multiplayer server of Wesnoth.")
@@ -69,18 +70,6 @@ else
 		warning "probably wrong on your distribution. You should edit the recipe."
 	fi
 fi
-
-function cmake_enable {
-	local FLAG="$1"
-	local CMAKE_OPT="$2"
-	echo -n "-DENABLE_${CMAKE_OPT}="
-	if use "$FLAG"; then
-		echo "YES"
-	else
-		echo "NO"
-	fi
-	iuse=(${iuse[@]//$FLAG} $FLAG)
-}
 
 cmake_opts=(
 	$(cmake_enable nls        NLS)
