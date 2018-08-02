@@ -5,7 +5,7 @@ source:   http://wgetpaste.zlin.dk/%{name}-%{version}.tar.bz2
 
 packager: Olivier Dᴏꜱꜱᴍᴀɴɴ <pkgxx@dossmann.net>
 url:      http://wgetpaste.zlin.dk/
-summary:  Command that sends text so pastebin-like website
+summary:  Command that sends text to pastebin-like website
 dependencies: bash, wget
 
 @install
